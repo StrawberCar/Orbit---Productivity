@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kanzu</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app" id="app"><!-- zoom wrapper -->
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">🗂️</span>
+        <h1 contenteditable="true" spellcheck="false" id="board-title" aria-label="Board title">My Kanban</h1>
+      </div>
+
+      <div class="actions">
+        <button id="boards-btn" title="Open boards menu">📋 Boards</button>
+
+        <button id="add-column-btn" title="Add column (lists)">➕ Column</button>
+
+        <div class="divider"></div>
+
+        <button id="export-btn" title="Export board to file">💾 Export</button>
+        <label for="import-file" class="btn" title="Import board from file">📂 Import</label>
+        <input type="file" id="import-file" accept=".json,application/json" hidden />
+
+        <div class="divider"></div>
+
+        <button id="connect-github" title="Connect GitHub (paste token)">🔗 GitHub</button>
+        <button id="save-github" title="Save to GitHub (create/update)">⬆️ Save to GitHub</button>
+        <span id="github-status" class="pill" aria-live="polite">GitHub: Disconnected</span>
+
+        <div class="divider"></div>
+
+        <button id="theme-toggle" title="Toggle theme">🌓 Theme</button>
+        <div class="zoom-ctrl" title="Zoom">
+          <button id="zoom-out" aria-label="Zoom out">−</button>
+          <input id="zoom-range" type="range" min="80" max="150" step="5" value="100" />
+          <span id="zoom-label">100%</span>
+          <button id="zoom-in" aria-label="Zoom in">＋</button>
+        </div>
+
+        <input id="search" type="search" placeholder="Search cards ( / )" aria-label="Search cards" />
+        <button id="reset-btn" title="Create a fresh board">🧼 New Board</button>
+      </div>
+    </header>
+
+    <main id="board" class="board" aria-live="polite" aria-label="Kanban board columns">
+      <!-- Columns will be rendered here -->
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <!-- Card Editor Modal -->
+    <dialog id="card-modal" class="modal">
+      <form id="card-form" method="dialog">
+        <header class="modal-head">
+          <h2 id="modal-title">Edit Card</h2>
+          <button type="button" class="icon-btn" id="close-modal" title="Close">✖</button>
+        </header>
+
+        <div class="form-grid">
+          <label>
+            Title*
+            <input id="card-title" required maxlength="120" placeholder="e.g., Write devlog" />
+          </label>
+
+          <label>
+            Due date
+            <input id="card-due" type="date" />
+          </label>
+
+          <label>
+            Color
+            <input id="card-color" type="color" value="#ffd166" />
+          </label>
+
+          <label class="full">
+            Description
+            <textarea id="card-desc" rows="5" placeholder="Optional notes…"></textarea>
+          </label>
+        </div>
+
+        <footer class="modal-foot">
+          <button type="button" id="delete-card" class="danger">Delete</button>
+          <div class="spacer"></div>
+          <button value="cancel" type="button" id="cancel-card">Cancel</button>
+          <button value="default" id="save-card" class="primary">Save</button>
+        </footer>
+
+        <input type="hidden" id="card-id" />
+        <input type="hidden" id="card-column-id" />
+      </form>
+    </dialog>
+
+    <!-- Boards Modal -->
+    <dialog id="boards-modal" class="modal">
+      <header class="modal-head">
+        <h2>Boards</h2>
+        <button type="button" class="icon-btn" id="close-boards" title="Close">✖</button>
+      </header>
+
+      <div class="boards-wrap">
+        <section>
+          <h3>Local</h3>
+          <ul id="local-list" class="board-list"></ul>
+          <div class="row">
+            <button id="new-board" class="primary">＋ New Board</button>
+            <button id="dup-board">⧉ Duplicate Current</button>
+            <button id="del-board" class="danger">🗑 Delete Current</button>
+          </div>
+        </section>
+
+        <section>
+          <h3>GitHub (Gists)</h3>
+          <div class="row">
+            <button id="refresh-github">↻ Refresh</button>
+            <button id="save-as-github">⬆️ Save Current as New Gist</button>
+          </div>
+          <ul id="github-list" class="board-list"></ul>
+          <small class="muted">We detect files ending with <code>.kanban.json</code> in your Gists.</small>
+        </section>
+      </div>
+
+      <footer class="modal-foot">
+        <span id="modal-github-status" class="muted">GitHub: Disconnected</span>
+        <div class="spacer"></div>
+        <button id="open-selected" class="primary">Open Selected</button>
+      </footer>
+    </dialog>
+
+    <!-- Templates -->
+    <template id="column-template">
+      <section class="column" data-column-id="" draggable="true">
+        <header class="column-head">
+          <h3 class="column-title" contenteditable="true" spellcheck="false"></h3>
+          <div class="column-controls">
+            <button class="add-card-btn" title="Add card">＋</button>
+            <button class="column-menu-btn" title="Column menu">⋯</button>
+            <menu class="column-menu" hidden>
+              <button class="rename-col">Rename</button>
+              <button class="delete-col danger">Delete</button>
+            </menu>
+          </div>
+        </header>
+        <div class="cards" role="list"></div>
+        <button class="add-card-cta">＋ Add a card</button>
+      </section>
+    </template>
+
+    <template id="card-template">
+      <article class="card" role="listitem" draggable="true" data-card-id="">
+        <div class="color-strip"></div>
+        <div class="card-body">
+          <h4 class="card-title"></h4>
+          <p class="card-desc"></p>
+          <div class="meta">
+            <span class="due" title="Due date"></span>
+          </div>
+        </div>
+        <button class="edit-btn" title="Edit">✎</button>
+      </article>
+    </template>
+
+  </div><!-- /.app -->
+
+  <script src="app.js"></script>
+</body>
+</html>

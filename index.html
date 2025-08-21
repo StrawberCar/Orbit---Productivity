@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Orbit</title>
+  <link rel="icon" type="image/x-icon" href="icon.png">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header id="siteHeader">
+    <div class="bar">
+      <div class="brand">
+        <div class="dot" aria-hidden="true"></div>
+        <div>Orbit</div>
+      </div>
+
+      <div class="spacer"></div>
+
+      <!-- Status indicator moved into header (replaces theme badge) -->
+      <div id="status" class="pill" aria-live="polite" title="Hub status">
+        <strong>Status:</strong> <span id="statusText">Loading hubconfig.ocf…</span>
+      </div>
+
+      <div class="actions">
+        <label id="loadWrapper" class="btn" title="Load a .ocf file manually">
+          Load .ocf
+          <input id="fileLoader" type="file" accept=".ocf,.txt" />
+        </label>
+        <button id="reloadBtn" class="btn" title="Reload hubconfig.ocf from server">Reload</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainArea">
+    <!-- (status pill is now in the header) -->
+    <section id="hub" class="hub grid" role="list"></section>
+
+    <footer>
+      <span id="footerText">
+        Powered by <code>hubconfig.ocf</code> • Edit the file, refresh the page, boom—hub glow-up.
+        <br/>Tip: Put icons in <code>assets/</code> and pages in <code>pages/</code>. Keep names consistent with the [Buttons]/[Links] keys.
+      </span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

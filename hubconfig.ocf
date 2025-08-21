@@ -1,0 +1,35 @@
+[Config]
+TilesTiltToMouseOnHover = true
+ShowLoadButton = false            
+ShowReloadButton = false         
+OpenExternalInNewTab = false
+SortButtons = None
+FooterText = This app is a part of the QuoteFeed system. Created with love by StrawberCar
+
+[Style]
+Colour = Forest
+DarkMode = True
+ButtonIcons = False
+Layout = Grid
+
+TileSize = 160px
+TileGap = 20px
+TilePadding = 18px
+BorderRadius = 18px
+BorderWidth = 2px
+HoverLift = 8px
+TiltDegrees = 12
+
+EnableGlow = True
+HeaderSticky = False
+FontFamily = ui-sans-serif, system-ui
+MaxWidth = 1200px
+LabelAlign = Auto
+IconSize = 28px
+
+[Buttons]
+<Kanban Board>:<assets/icon.png>
+
+[Links]
+<Kanban Board>:<kanbanboard/index.html>
+

@@ -1,0 +1,176 @@
+/* ---------- Base & Variables ---------- */
+:root {
+  /* default/fallback palette */
+  --bg: #0f1220;
+  --surface: #171a2b;
+  --muted: #22253a;
+  --text: #e6e9ef;
+  --subtext: #b7beca;
+  --accent: #7aa2ff;
+  --accent-2: #ff9d66;
+
+  /* tweakables (overridden by JS from OCF) */
+  --radius: 14px;           /* Border radius of tiles */
+  --border-width: 1px;      /* Border thickness of tiles */
+  --tile-gap: 16px;         /* Gap between tiles */
+  --tile-size: 132px;       /* Minimum tile size (grid minmax) */
+  --tile-pad: 14px;         /* Tile inner padding */
+  --hover-lift: 6px;        /* How far tiles rise on hover */
+
+  --shadow: 0 10px 30px rgba(0,0,0,.25);
+  --shadow-2: 0 30px 60px rgba(0,0,0,.25);
+
+  --font: ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  background: linear-gradient(180deg, var(--bg), color-mix(in oklab, var(--bg) 80%, black 20%));
+  color: var(--text);
+  font-family: var(--font);
+  margin: 0;
+}
+
+/* ---------- Header ---------- */
+header {
+  position: sticky; top: 0;
+  backdrop-filter: blur(8px);
+  background: color-mix(in oklab, var(--bg) 80%, transparent);
+  border-bottom: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+  z-index: 3;
+}
+.bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px clamp(12px, 4vw, 28px);
+}
+.brand {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 800; letter-spacing: .3px;
+}
+.brand .dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, white 0 15%, var(--accent) 35% 100%);
+  box-shadow: 0 0 20px var(--accent);
+}
+.tag {
+  font: 12px/1 var(--mono);
+  color: var(--subtext);
+  padding: 4px 8px;
+  border: 1px dashed color-mix(in oklab, var(--muted) 80%, transparent);
+  border-radius: 999px;
+  user-select: none;
+}
+.spacer { flex: 1; }
+.pill {
+  font: 12px/1 var(--mono);
+  color: var(--text);
+  background: color-mix(in oklab, var(--muted) 20%, transparent);
+  border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+  padding: 8px 10px;
+  border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.pill strong { color: var(--accent); }
+.pill code { color: var(--subtext); }
+
+.actions { display: flex; gap: 8px; }
+button, .btn {
+  background: color-mix(in oklab, var(--muted) 25%, transparent);
+  color: var(--text);
+  border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+  border-radius: 10px;
+  padding: 8px 12px;
+  font: 600 14px var(--font);
+  cursor: pointer;
+  transition: transform .12s ease, background .12s ease, border-color .12s ease;
+}
+button:hover, .btn:hover { transform: translateY(-1px); border-color: var(--accent); }
+input[type="file"] { display: none; }
+
+/* ---------- Main ---------- */
+main {
+  max-width: 1200px;
+  margin: 28px auto;
+  padding: 0 clamp(12px, 4vw, 28px) 48px;
+}
+
+/* layout switches */
+.hub.grid { 
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--tile-size), 1fr));
+  gap: var(--tile-gap);
+}
+.hub.list {
+  display: flex; flex-direction: column; gap: var(--tile-gap);
+}
+
+/* ---------- Tile/Button ---------- */
+.tile {
+  position: relative;
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 80%, transparent), color-mix(in oklab, var(--muted) 20%, transparent));
+  border: var(--border-width) solid color-mix(in oklab, var(--muted) 65%, transparent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--tile-pad);
+  min-height: var(--tile-size);
+  display: flex; gap: 12px; align-items: center; justify-content: center;
+  text-decoration: none; color: inherit;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease, background .15s ease;
+  overflow: clip;
+  transform-style: preserve-3d;
+}
+/* Hover lift always works (tilt JS will include this translateY too) */
+.tile:hover {
+  border-color: color-mix(in oklab, var(--accent) 50%, var(--muted));
+  box-shadow: var(--shadow-2);
+  background: linear-gradient(180deg, color-mix(in oklab, var(--surface) 65%, transparent), color-mix(in oklab, var(--muted) 35%, transparent));
+  transform: translateY(calc(-1 * var(--hover-lift)));
+}
+
+.tile .icon-wrap {
+  flex: 0 0 48px; height: 48px; display: grid; place-items: center;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--muted) 25%, transparent);
+  border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
+  overflow: hidden;
+}
+.tile img {
+  width: 28px; height: 28px; object-fit: contain; display: block;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.3));
+}
+.tile .label {
+  font-weight: 800; letter-spacing: .2px;
+  text-wrap: balance;
+  text-align: center;
+}
+.tile.listish { justify-content: flex-start; }
+.tile.listish .label { text-align: left; }
+
+/* Tilt assist glow */
+.glow {
+  position: absolute; inset: -40%;
+  background: radial-gradient(600px 200px at var(--mx,50%) var(--my,50%), color-mix(in oklab, var(--accent) 20%, transparent), transparent 60%);
+  opacity: 0; pointer-events: none; transition: opacity .2s ease;
+}
+.tile:hover .glow { opacity: .8; }
+
+/* ---------- Footer ---------- */
+footer {
+  opacity: .6; color: var(--subtext);
+  text-align: center; font: 12px/1.6 var(--mono);
+  padding-top: 28px;
+}
+
+/* ---------- Theme Badges ---------- */
+.theme-badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px;
+  border-radius: 999px; border: 1px solid color-mix(in oklab, var(--muted) 70%, transparent);
+  background: color-mix(in oklab, var(--muted) 15%, transparent);
+  font: 12px var(--mono); color: var(--subtext);
+}
+.theme-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+
+/* ---------- Hidden on icons=false ---------- */
+.no-icons .icon-wrap { display: none; }
