@@ -3,8 +3,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kanzu</title>
+  <title>KanbanFeed</title>
   <link rel="stylesheet" href="styles.css" />
+
+  <script>
+    /* ====== CONFIG ======
+     * Put your GitHub OAuth App "Client ID" here.
+     * Make sure your OAuth App has the callback/redirect URL set to your site URL (see instructions below).
+     */
+    window.KANZU_OAUTH = {
+      GITHUB_CLIENT_ID: "YOUR_GITHUB_OAUTH_CLIENT_ID",
+      // The serverless endpoint (same origin is simplest). Change if you deploy elsewhere.
+      EXCHANGE_ENDPOINT: "/api/github-exchange",
+      // Scope needed to create/update Gists:
+      SCOPE: "gist"
+    };
+  </script>
 </head>
 <body>
   <div class="app" id="app"><!-- zoom wrapper -->
@@ -17,7 +31,6 @@
 
       <div class="actions">
         <button id="boards-btn" title="Open boards menu">📋 Boards</button>
-
         <button id="add-column-btn" title="Add column (lists)">➕ Column</button>
 
         <div class="divider"></div>
@@ -28,9 +41,9 @@
 
         <div class="divider"></div>
 
-        <button id="connect-github" title="Connect GitHub (paste token)">🔗 GitHub</button>
+        <button id="connect-github" title="Sign in with GitHub">🔗 Sign in with GitHub</button>
         <button id="save-github" title="Save to GitHub (create/update)">⬆️ Save to GitHub</button>
-        <span id="github-status" class="pill" aria-live="polite">GitHub: Disconnected</span>
+        <span id="github-status" class="pill" aria-live="polite">GitHub: Signed out</span>
 
         <div class="divider"></div>
 
@@ -47,9 +60,7 @@
       </div>
     </header>
 
-    <main id="board" class="board" aria-live="polite" aria-label="Kanban board columns">
-      <!-- Columns will be rendered here -->
-    </main>
+    <main id="board" class="board" aria-live="polite" aria-label="Kanban board columns"></main>
 
     <!-- Toast -->
     <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -68,15 +79,8 @@
             <input id="card-title" required maxlength="120" placeholder="e.g., Write devlog" />
           </label>
 
-          <label>
-            Due date
-            <input id="card-due" type="date" />
-          </label>
-
-          <label>
-            Color
-            <input id="card-color" type="color" value="#ffd166" />
-          </label>
+          <label>Due date<input id="card-due" type="date" /></label>
+          <label>Color<input id="card-color" type="color" value="#ffd166" /></label>
 
           <label class="full">
             Description
@@ -126,7 +130,7 @@
       </div>
 
       <footer class="modal-foot">
-        <span id="modal-github-status" class="muted">GitHub: Disconnected</span>
+        <span id="modal-github-status" class="muted">GitHub: Signed out</span>
         <div class="spacer"></div>
         <button id="open-selected" class="primary">Open Selected</button>
       </footer>
@@ -157,9 +161,7 @@
         <div class="card-body">
           <h4 class="card-title"></h4>
           <p class="card-desc"></p>
-          <div class="meta">
-            <span class="due" title="Due date"></span>
-          </div>
+          <div class="meta"><span class="due" title="Due date"></span></div>
         </div>
         <button class="edit-btn" title="Edit">✎</button>
       </article>
